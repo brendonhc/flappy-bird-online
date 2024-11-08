@@ -123,9 +123,19 @@ class FlappyBirdScene extends Phaser.Scene {
 			get(rankingRef).then((snapshot) => {
 				if (snapshot.exists()) {
 					const ranking = snapshot.val();
-					// Display rankings
-					// this.showRankings(ranking);
-					console.log({ ranking });
+
+					// Ordenando o Ranking
+					const rankingSortedList = Object.entries(ranking).sort((a, b) => b[1] - a[1]);
+
+					// Criando uma string com o Ranking legível
+					const rankingListString = rankingSortedList.map((item, index) => {
+						return `${index + 1}º ${item[0]} - ${item[1]}`;
+					}
+					).join('\n');
+
+					// Exibindo o ranking
+					console.log(rankingListString);
+					alert(rankingListString);
 				} else {
 					console.log('No data available');
 				}
@@ -252,7 +262,7 @@ class FlappyBirdScene extends Phaser.Scene {
 			this.bestScore.setText(bestScore);
 
 			if (bestScore > 0 && bestScore > this.score) {
-				const playerName = 'SALVE';
+				const playerName = 'ANONIMO';
 
 				const playerRef = ref(database, `ranking/${playerName}`);
 
