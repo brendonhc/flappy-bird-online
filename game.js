@@ -1,6 +1,6 @@
 import FlappyBirdScene from './js/FlappyBirdScene.js';
 
-window.onload = function(){
+window.onload = function () {
     var config = {
         type: Phaser.AUTO,
         physics: {
@@ -17,9 +17,10 @@ window.onload = function(){
             width: 288,
             height: 512
         },
-        scene : [ FlappyBirdScene ]
+        scene: [FlappyBirdScene]
     };
 
+    console.log()
     var game = new Phaser.Game(config);
 }
 

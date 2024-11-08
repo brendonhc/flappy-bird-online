@@ -1,6 +1,9 @@
 import assets from './assets.js';
 import FlappyBird from './FlappyBird.js';
 
+import { database } from '../firebaseConfig.js';
+import { ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
 class FlappyBirdScene extends Phaser.Scene {
 	constructor() {
 		super("FlappyBird");
@@ -114,8 +117,21 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.rankingButton.setDepth(30);
 		this.rankingButton.visible = false;
 		this.rankingButton.on('pointerdown', () => {
-			// TODO: show ranking
-			console.log('TODO: show ranking');
+
+			// Buscando o Ranking no Firebase
+			var rankingRef = ref(database, 'ranking');
+			get(rankingRef).then((snapshot) => {
+				if (snapshot.exists()) {
+					const ranking = snapshot.val();
+					// Display rankings
+					// this.showRankings(ranking);
+					console.log({ ranking });
+				} else {
+					console.log('No data available');
+				}
+			}).catch((error) => {
+				console.error('Error fetching ranking data:', error);
+			});
 		});
 
 		this.scoreboard = this.add.image(assets.scene.width, 200, assets.scoreboard.score);
@@ -234,6 +250,15 @@ class FlappyBirdScene extends Phaser.Scene {
 		if (bestScore) {
 			localStorage.setItem('bestScore', Math.max(this.score, bestScore));
 			this.bestScore.setText(bestScore);
+
+			if (bestScore > 0 && bestScore > this.score) {
+				const playerName = 'SALVE';
+
+				const playerRef = ref(database, `ranking/${playerName}`);
+
+				set(playerRef, bestScore);
+			}
+
 		} else {
 			localStorage.setItem('bestScore', this.score);
 			this.bestScore.setText(0);
