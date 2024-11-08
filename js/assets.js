@@ -37,6 +37,7 @@ const assets = {
         ground: 'ground',
         gameOver: 'game-over',
         restartGame: 'restart-button',
+        rankingGame: 'ranking-button',
         startGame: 'start-game'
     },
     scoreboard: {

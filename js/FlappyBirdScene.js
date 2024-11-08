@@ -2,11 +2,11 @@ import assets from './assets.js';
 import FlappyBird from './FlappyBird.js';
 
 class FlappyBirdScene extends Phaser.Scene {
-	constructor(){
+	constructor() {
 		super("FlappyBird");
 	}
 
-	preload(){
+	preload() {
 		let game = this;
 
 		// scene assets
@@ -20,13 +20,14 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.load.image(assets.scene.startGame, 'assets/startgame.png');
 		this.load.image(assets.scene.gameOver, 'assets/gameover.png');
 		this.load.image(assets.scene.restartGame, 'assets/restart-button.png');
-		
-		[assets.obstacle.pipe.green, assets.obstacle.pipe.red].forEach(function(pipe){
+		this.load.image(assets.scene.rankingGame, 'assets/ranking-button.png');
+
+		[assets.obstacle.pipe.green, assets.obstacle.pipe.red].forEach(function (pipe) {
 			game.load.image(pipe.top, `assets/${pipe.top}.png`);
 			game.load.image(pipe.bottom, `assets/${pipe.bottom}.png`);
 		});
 
-		Object.keys(assets.bird).forEach(function(key){
+		Object.keys(assets.bird).forEach(function (key) {
 			let bird = assets.bird[key].name;
 			game.load.spritesheet(bird, `assets/${bird}-sprite.png`, {
 				frameWidth: 34,
@@ -36,7 +37,7 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.load.image(assets.scoreboard.score, 'assets/score.png');
 	}
 
-	create(){
+	create() {
 		let game = this;
 
 		// background
@@ -48,24 +49,24 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.pipes = this.physics.add.group();
 
 		// birds animation 
-		Object.keys(assets.bird).forEach(function(key){
+		Object.keys(assets.bird).forEach(function (key) {
 			game.anims.create({
-					key: assets.bird[key].clapWings,
-					frames: game.anims.generateFrameNumbers(assets.bird[key].name, {
-							start: 0,
-							end: 2
-					}),
-					frameRate: 10,
-					repeat: -1
+				key: assets.bird[key].clapWings,
+				frames: game.anims.generateFrameNumbers(assets.bird[key].name, {
+					start: 0,
+					end: 2
+				}),
+				frameRate: 10,
+				repeat: -1
 			});
 
 			game.anims.create({
-					key: assets.bird[key].stop,
-					frames: [{
-							key: assets.bird[key].name,
-							frame: 1
-					}],
-					frameRate: 20
+				key: assets.bird[key].stop,
+				frames: [{
+					key: assets.bird[key].name,
+					frame: 1
+				}],
+				frameRate: 20
 			});
 		});
 
@@ -76,7 +77,8 @@ class FlappyBirdScene extends Phaser.Scene {
 		// ajust collision box for the ground
 		this.ground.setSize(0, 100, 0, 0).setOffset(0, 10);
 
-		this.anims.create({ key: assets.animation.ground.moving, 
+		this.anims.create({
+			key: assets.animation.ground.moving,
 			frames: this.anims.generateFrameNumbers(assets.scene.ground, {
 				start: 0,
 				end: 2
@@ -85,14 +87,15 @@ class FlappyBirdScene extends Phaser.Scene {
 			repeat: -1
 		});
 
-		this.anims.create({ key: assets.animation.ground.moving, 
-			frames:[{
+		this.anims.create({
+			key: assets.animation.ground.moving,
+			frames: [{
 				key: assets.scene.ground,
 				frame: 0
 			}],
 			frameRate: 20
 		});
-		
+
 		// start, over, repeat
 		this.start = this.add.image(assets.scene.width, 156, assets.scene.startGame);
 		this.start.setDepth(30);
@@ -107,85 +110,93 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.restart.visible = false;
 		this.restart.on('pointerdown', () => this.restartGame(this));
 
+		this.rankingButton = this.add.image(assets.scene.width, 350, assets.scene.rankingGame).setInteractive();
+		this.rankingButton.setDepth(30);
+		this.rankingButton.visible = false;
+		this.rankingButton.on('pointerdown', () => {
+			// TODO: show ranking
+			console.log('TODO: show ranking');
+		});
+
 		this.scoreboard = this.add.image(assets.scene.width, 200, assets.scoreboard.score);
 		this.scoreboard.scale = 0.5;
 		this.scoreboard.setDepth(30);
 
-		this.scoreTxt = this.add.text(assets.scene.width, 40, 
-			'0', { 
-					fontFamily: 'font1', 
-					fontSize: '38px', 
-					fill: '#fff', 
-					stroke: '#000',
-					strokeThickness: 4,
-					strokeLinecap: 'square',
-					shadow: {
-						offsetX: 2.5,
-						offsetY: 3,
-						color: '#000',
-						blur: 0,
-						stroke: true,
-						fill: true
-					}
-				}
-			);
+		this.scoreTxt = this.add.text(assets.scene.width, 40,
+			'0', {
+			fontFamily: 'font1',
+			fontSize: '38px',
+			fill: '#fff',
+			stroke: '#000',
+			strokeThickness: 4,
+			strokeLinecap: 'square',
+			shadow: {
+				offsetX: 2.5,
+				offsetY: 3,
+				color: '#000',
+				blur: 0,
+				stroke: true,
+				fill: true
+			}
+		}
+		);
 		this.scoreTxt.setDepth(30);
 		this.scoreTxt.setOrigin(0.5); //center text
 		this.scoreTxt.alpha = 0;
 
-		this.scored = this.add.text(assets.scene.width+5, 186, 
-			'0', { 
-					fontFamily: 'font1', 
-					fontSize: '18px', 
-					fill: '#fff', 
-					stroke: '#000',
-					strokeThickness: 3,
-				}
-			);
+		this.scored = this.add.text(assets.scene.width + 5, 186,
+			'0', {
+			fontFamily: 'font1',
+			fontSize: '18px',
+			fill: '#fff',
+			stroke: '#000',
+			strokeThickness: 3,
+		}
+		);
 		this.scored.setDepth(30);
 		this.scored.setOrigin(0.5);
 
-		this.bestScore = this.add.text(assets.scene.width+5, 225, 
-			'0', { 
-					fontFamily: 'font1', 
-					fontSize: '18px', 
-					fill: '#fff', 
-					stroke: '#000',
-					strokeThickness: 3,
-				}
-			);
+		this.bestScore = this.add.text(assets.scene.width + 5, 225,
+			'0', {
+			fontFamily: 'font1',
+			fontSize: '18px',
+			fill: '#fff',
+			stroke: '#000',
+			strokeThickness: 3,
+		}
+		);
 		this.bestScore.setDepth(30);
 		this.bestScore.setOrigin(0.5, 0.5);
 
 		this.initGame();
 	}
 
-	update(time, delta){
+	update(time, delta) {
 		if (this.isGameOver) return;
 		if (!this.hasGameStarted) return;
 
 		this.flappyBird.falls();
 
-		this.pipes.children.iterate(function(pipe){
+		this.pipes.children.iterate(function (pipe) {
 			if (pipe == undefined) return;
 			if (pipe.x < -50) pipe.destroy();
 			else pipe.setVelocityX(-100);
 		});
 
-		this.gaps.children.iterate(function(gap){
+		this.gaps.children.iterate(function (gap) {
 			gap.body.setVelocityX(-100);
 		});
 
 		this.nextPipes++;
 
-		if (this.nextPipes === 130){
+		if (this.nextPipes === 130) {
 			this.makePipes();
 			this.nextPipes = 0;
 		}
 
 	}
 
-	initGame(){
+	initGame() {
 		this.nextPipes = 0;
 		this.score = 0;
 		this.isGameOver = false;
@@ -209,18 +220,18 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.physics.add.collider(this.flappyBird, this.ground, this.hitBird, null, this);
 		this.physics.add.overlap(this.flappyBird, this.pipes, this.hitBird, null, this);
 		this.physics.add.overlap(this.flappyBird, this.gaps, this.updateScore, null, this);
-		this.ground.anims.play( assets.animation.ground.moving, true );
+		this.ground.anims.play(assets.animation.ground.moving, true);
 	}
 
-	flapBird(){
+	flapBird() {
 		if (this.isGameOver) return;
 		if (!this.hasGameStarted) this.startGame();
 		this.flappyBird.flap();
 	}
 
-	saveScore(){
+	saveScore() {
 		let bestScore = parseInt(localStorage.getItem('bestScore'));
-		if (bestScore){
+		if (bestScore) {
 			localStorage.setItem('bestScore', Math.max(this.score, bestScore));
 			this.bestScore.setText(bestScore);
 		} else {
@@ -232,9 +243,9 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.bestScore.visible = true;
 	}
 
-	hitBird(){
+	hitBird() {
 		// stop the pipes
-		this.pipes.children.iterate(function(pipe){
+		this.pipes.children.iterate(function (pipe) {
 			if (pipe == undefined) return;
 			pipe.setVelocityX(0);
 		});
@@ -248,27 +259,30 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.gameOver.visible = true;
 		this.restart.visible = true;
 		this.scoreTxt.setText('');
+
+		this.rankingButton.setVisible(true);
 	}
 
-	restartGame(scene){
+	restartGame(scene) {
 		scene.pipes.clear(true, true);
 		scene.gaps.clear(true, true);
 		scene.flappyBird.destroy();
 		scene.gameOver.visible = false;
 		scene.scoreboard.visible = false;
 		scene.restart.visible = false;
+		scene.rankingButton.visible = false;
 		scene.scoreTxt.setText('0');
 		scene.initGame();
 	}
 
-	updateScore(_, gap){
+	updateScore(_, gap) {
 		this.score++;
 		gap.destroy();
 
-		if (this.score % 10 == 0){
+		if (this.score % 10 == 0) {
 			this.backgroundDay.visible = !this.backgroundDay.visible;
 			this.backgroundNight.visible = !this.backgroundNight.visible;
-			if (this.currentPipe === assets.obstacle.pipe.green){
+			if (this.currentPipe === assets.obstacle.pipe.green) {
 				this.currentPipe = assets.obstacle.pipe.red;
 			} else {
 				this.currentPipe = assets.obstacle.pipe.green;
@@ -277,14 +291,14 @@ class FlappyBirdScene extends Phaser.Scene {
 		this.scoreTxt.setText(this.score);
 	}
 
-	startGame(){
+	startGame() {
 		this.scoreTxt.alpha = 1;
 		this.hasGameStarted = true;
 		this.start.visible = false;
 		this.makePipes();
 	}
 
-	makePipes(){
+	makePipes() {
 		if (!this.hasGameStarted) return;
 		if (this.isGameOver) return;
 
@@ -298,7 +312,7 @@ class FlappyBirdScene extends Phaser.Scene {
 		pipeTop.body.allowGravity = false;
 
 		const pipeBottom = this.pipes.create(288, top + 420, this.currentPipe.bottom).setImmovable(true);
-		pipeBottom.body.allowGravity = false;			
+		pipeBottom.body.allowGravity = false;
 	}
 }
 

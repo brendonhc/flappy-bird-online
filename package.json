@@ -1,7 +1,7 @@
 {
   "name": "flappy-bird",
   "version": "1.0.0",
-  "description": "Flappy Bird clone on Phaser 3",
+  "description": "Flappy Bird clone on Phaser 3 - Online",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -12,7 +12,6 @@
     "bird",
     "phaser"
   ],
-  "author": "John Curcio",
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.1"
